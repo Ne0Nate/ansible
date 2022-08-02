@@ -1,0 +1,48 @@
+- hosts: "all"
+#  become: yes
+  gather_facts: no
+  become_user: root
+
+  vars_prompt:
+
+    - name: "username" 
+      prompt: "enter user name" 
+      private: no
+
+    - name: "ssh_keys"
+      promtp: "enter id_rsa.pub"
+      private: no
+
+  tasks:
+#  - name: Add ssh key to root authorized
+#    authorized_key:
+#      user: root
+#      state: present
+#      key: "{{ ssh_keys }}"
+  - name: show passwd {{ username }}
+    shell: cat /etc/passwd | grep {{ username }}
+    register: passwd
+    ignore_errors: True
+
+  - debug: msg="{{ passwd.stdout }}"
+
+  # - name: passwd user {{ username }} is exist - remove user
+  #   shell: userdel {{ username }}
+  #   when: passwd is succeeded
+
+  - name: show home dir {{ username }}
+    shell: ls -l /home/ | grep {{ username }}
+    register: home
+    ignore_errors: True
+
+  - debug: msg="{{ home.stdout }}"
+
+  # - name: home user {{ username }} is exist - remove dir
+  #   shell: rm -rf /home/{{ username }}
+  #   when: home is succeeded
+
+  # - name: Delete ssh key to root authorized
+  #   authorized_key:
+  #     user: root
+  #     state: absent
+  #     key: "{{ ssh_keys }}"
